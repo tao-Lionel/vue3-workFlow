@@ -7,7 +7,7 @@
 <template>
   <div class="process">
     <div class="process-nav">
-      <span class="c-theme">xx</span>
+      <span class="c-theme">{{ processName }}</span>
       <a-button type="">发布</a-button>
     </div>
     <div class="process-main">
@@ -17,11 +17,23 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "@vue/runtime-core";
+import { onMounted, ref, Ref } from "vue";
+import http from "@/plugins/axios";
+import { ProcessDataType } from "./setting";
 
-onMounted(() => {});
+onMounted(() => {
+  http.get(`${process.env.BASE_URL}data.json`, {}).then(({ data }) => {
+    processData.value = data;
+    const { workFlowDef } = processData as ProcessDataType;
+    processName.value as string = workFlowDef;
+  });
 
+  // 流程名称
+  const processName = ref<string>("");
 
+  // 本地备份的流程数据
+  const processData = ref<ProcessDataType>({});
+});
 </script>
 
 <style scoped lang="scss">

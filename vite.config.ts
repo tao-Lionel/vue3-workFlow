@@ -15,7 +15,22 @@ export default defineConfig(
           }
         ]
       },
+      alias: [
+        {
+          find: "@",
+          replacement: resolve(__dirname, "./src")
+        }
+      ],
+      server: {
+        port: 5005,
+
+      },
+      define: {
+        'process.env': {
+          'BASE_URL': '/'
+        }
+      },
       plugins: [vue()]
     }
-  }
+  },
 )
