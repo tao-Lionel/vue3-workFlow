@@ -1,5 +1,7 @@
 $color-list: (
   theme: #1890ff,
+  black: #333,
+  white: #fff,
 );
 
 @each $color-name, $color-value in $color-list {

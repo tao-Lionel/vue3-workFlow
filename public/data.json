@@ -10,7 +10,7 @@
         "flowPermission": [], 
         "nodeConfig": {
             "nodeName": "发起人",
-            "type": 0,
+            "type": 1,
             "priorityLevel": "",
             "settype": "",
             "selectMode": "", 
