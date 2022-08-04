@@ -54,7 +54,7 @@ const flowPermissionData = ref<Array<any>>([]); // 本地的发起人
 
 const directorMaxLevelData = ref(0); // 本地的审批主管最大层级
 
-console.log("testteststsetsetsetset");
+console.log("test");
 </script>
 
 <style scoped lang="scss">
