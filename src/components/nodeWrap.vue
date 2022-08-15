@@ -21,29 +21,50 @@
 
 <script setup lang="ts">
 import { UserOutlined, SendOutlined } from "@ant-design/icons-vue";
-import { onMounted, ref } from "vue";
+import { onMounted, ref, onBeforeMount, watch, Ref } from "vue";
 import { setApproverStr } from "@/plugins/utils";
-onMounted(() => {
-  // 如果是审批
-  //   console.log(nodeConfig);
-  //   if (nodeConfig.value.type === 1) {
-  //     console.log(setApproverStr(nodeConfig));
-  //     nodeConfig.value.error = !setApproverStr(nodeConfig);
-  //   }
+import { NodeConfig } from "@/views/setting";
+
+const props = defineProps({
+  nodeConfigData: {
+    type: Object,
+    required: true,
+  },
+  flowPermissionData: {
+    type: Object,
+    required: true,
+  },
 });
 
-const props = defineProps(["nodeConfigData"]);
+defineEmits(["update:nodeConfigData", "update:flowPermissionData"]);
 
-defineEmits(["update:nodeConfigData"]);
+onMounted(() => {
+  // 如果是审批
+  console.log(nodeConfig);
+  if (nodeConfig.value.type === 1) {
+    console.log(setApproverStr(nodeConfig.value));
+    nodeConfig.value.error = !setApproverStr(nodeConfig.value);
+  }
+});
 
-console.log(props);
+watch(
+  () => props.nodeConfigData,
+  val => {
+    console.log(val);
+    nodeConfig.value = val;
+  }
+);
 
-console.log(props.nodeConfigData);
+watch(
+  () => props.flowPermissionData,
+  val => {
+    console.log(val);
+    flowPermission.value = val;
+  }
+);
 
-const nodeConfig = ref(props.nodeConfigData);
-console.log(nodeConfig);
-
-// const flowPermission = ref(props.flowPermissionData);
+const nodeConfig = ref(props.nodeConfigData) as Ref<NodeConfig>;
+const flowPermission = ref(props.flowPermissionData);
 </script>
 
 <style scoped lang="scss">

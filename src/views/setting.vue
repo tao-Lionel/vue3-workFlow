@@ -11,7 +11,8 @@
       <a-button type="">发布</a-button>
     </div>
     <div class="process-main">
-      <NodeWrap :nodeConfigData="nodeConfigData" :title="title" v-model:flowPermissionData="flowPermissionData"></NodeWrap>
+      {{ nodeConfigData }}
+      <NodeWrap v-model:nodeConfigData="nodeConfigData" v-model:flowPermissionData="flowPermissionData"></NodeWrap>
       <div class="end-node">
         <div class="end-node-circle"></div>
         <div class="end-node-text">流程结束</div>
@@ -26,11 +27,9 @@ import http from "@/plugins/axios";
 import { data, Data } from "./setting";
 import { useStore } from "vuex";
 
-onBeforeMount(() => {
-  console.log("onBeforeMountonBeforeMountonBeforeMount");
-
+onBeforeMount(async () => {
   // 获取数据
-  http.get(`${process.env.BASE_URL}data.json`, {}).then(({ data }: { data: Data }) => {
+  await http.get(`${process.env.BASE_URL}data.json`, {}).then(({ data }: { data: Data }) => {
     const { workFlowDef, nodeConfig, flowPermission, directorMaxLevel, tableId } = data;
     processData.value = data;
     nodeConfigData.value = nodeConfig;
@@ -40,6 +39,7 @@ onBeforeMount(() => {
     store.commit("setTableId", tableId);
   });
 });
+
 const store = useStore();
 
 const processName = ref<string>(""); // 流程名称
@@ -48,13 +48,9 @@ const processData = ref<Data>(data); // 本地备份的流程数据
 
 const nodeConfigData = ref({}); // 本地的流程节点
 
-const title = ref(0);
-
 const flowPermissionData = ref<Array<any>>([]); // 本地的发起人
 
 const directorMaxLevelData = ref(0); // 本地的审批主管最大层级
-
-console.log("test");
 </script>
 
 <style scoped lang="scss">
