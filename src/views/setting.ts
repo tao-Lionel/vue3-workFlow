@@ -14,7 +14,7 @@ interface NodeUserList {
 interface ConditionList {
   columnId: number; //发起人id
   type: number; //1 发起人 2其他
-  optType: string; //["", "<", ">", "≤", "=", "≥"][optType]
+  optType: number; //["", "<", ">", "≤", "=", "≥"][optType]
   zdy1: string; //左侧自定义内容
   zdy2: string; //右侧自定义内容
   opt1: string; //左侧符号 < ≤
@@ -88,7 +88,8 @@ interface NodeConfig {
   conditionList: Array<ConditionList>; //当审批单同时满足以下条件时进入此流程
   nodeUserList: Array<NodeUserList>; //操作人
   childNode?: approverChildNode | CcChildNode;
-  conditionNodes?: Array<ConditionNodes>;
+  conditionNodes: Array<ConditionNodes>;
+  error: boolean;
 }
 
 /** 流程 */

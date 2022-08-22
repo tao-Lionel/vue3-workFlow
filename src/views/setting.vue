@@ -11,7 +11,6 @@
       <a-button type="">发布</a-button>
     </div>
     <div class="process-main">
-      {{ nodeConfigData }}
       <NodeWrap v-model:nodeConfigData="nodeConfigData" v-model:flowPermissionData="flowPermissionData"></NodeWrap>
       <div class="end-node">
         <div class="end-node-circle"></div>
