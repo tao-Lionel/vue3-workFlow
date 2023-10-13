@@ -1,141 +1,299 @@
-/** 流程名称 */
-interface WorkFlowDef {
-  name: string; // 流程名称
-}
+import { getRandomNumber, deepClone } from "../plugins/utils";
 
-/** 操作人 */
-interface NodeUserList {
-  targetId: number;
-  type: number;
-  name: string; // 操作人姓名
-}
-
-/** 条件 */
-interface ConditionList {
-  columnId: number; //发起人id
-  type: number; //1 发起人 2其他
-  optType: number; //["", "<", ">", "≤", "=", "≥"][optType]
-  zdy1: string; //左侧自定义内容
-  zdy2: string; //右侧自定义内容
-  opt1: string; //左侧符号 < ≤
-  opt2: string; //右侧符号 < ≤
-  columnDbName: string; //条件字段名称
-  columnType: string; //条件字段类型
-  showType: number; //3多选 其他
-  showName: string; //展示名
-  fixedDownBoxValue: ""; //多选数组
-}
-
-/**条件节点 */
-interface ConditionNodes {
-  nodeName: string; //节点名称
-  type: number; // 0 发起人 1审批 2抄送 3条件 4路由
-  priorityLevel: number; // 条件优先级
-  setApproverType: number; // 审批人设置 1指定成员 2主管 4发起人自选 5发起人自己 7连续多级主管
-  selectMode: number; //审批人数 1选一个人 2选多个人
-  selectRange: number; //选择范围 1.全公司 2指定成员 2指定角色
-  directorLevel: number; //审批终点  最高层主管数
-  examineMode: number; //多人审批时采用的审批方式 1依次审批 2会签
-  noHandlerAction: number; //审批人为空时 1自动审批通过/不允许发起 2转交给审核管理员
-  examineEndDirectorLevel: number; //审批终点 第n层主管
-  ccSelfSelectFlag: number; //允许发起人自选抄送人
-  conditionList: Array<ConditionList>;
-  nodeUserList: Array<NodeUserList>; //操作人
-  childNode?: approverChildNode | CcChildNode;
-  error: boolean;
-}
-
-/** 抄送节点 */
-interface CcChildNode {
-  nodeName: string; // 节点名称
-  type: number; //  0 发起人 1审批 2抄送 3条件 4路由
-  ccSelfSelectFlag: number; //允许发起人自选抄送人
-  nodeUserList: Array<NodeUserList>; //操作人
-  error: boolean; //当前审批是否通过校验
-  childNode?: approverChildNode | CcChildNode;
-  conditionNodes?: Array<ConditionNodes>;
-}
-
-/** 审批节点 */
-interface approverChildNode {
-  nodeName: string; // 节点名称
-  error: boolean; //当前审批是否通过校验
-  type: number; //  0 发起人 1审批 2抄送 3条件 4路由
-  setApproverType: number;
-  selectMode: number; //审批人数 1选一个人 2选多个人
-  selectRange: number; //选择范围 1.全公司 2指定成员 2指定角色
-  directorLevel: number; //审批终点  最高层主管数
-  examineMode: number; // 多人审批时采用的审批方式 1依次审批 2会签
-  noHandlerAction: number; //审批人为空时 1自动审批通过/不允许发起 2转交给审核管理员
-  examineEndDirectorLevel: number; //审批终点 第n层主管
-  childNode?: approverChildNode | CcChildNode;
-  conditionNodes?: Array<ConditionNodes>;
-}
-
-/** 整个流程的节点信息 */
-interface NodeConfig {
-  nodeName: string; //节点名称
-  type: number; // 0 发起人 1审批 2抄送 3条件 4路由
-  priorityLevel: number; // 条件优先级
-  setApproverType: number; // 审批人设置 1指定成员 2主管 4发起人自选 5发起人自己 7连续多级主管
-  selectMode: number; //审批人数 1选一个人 2选多个人
-  selectRange: number; //选择范围 1.全公司 2指定成员 2指定角色
-  directorLevel: number; //审批终点  最高层主管数
-  examineMode: number; //多人审批时采用的审批方式 1依次审批 2会签
-  noHandlerAction: number; //审批人为空时 1自动审批通过/不允许发起 2转交给审核管理员
-  examineEndDirectorLevel: number; //审批终点 第n层主管
-  ccSelfSelectFlag: number; //允许发起人自选抄送人
-  conditionList: Array<ConditionList>; //当审批单同时满足以下条件时进入此流程
-  nodeUserList: Array<NodeUserList>; //操作人
-  childNode?: approverChildNode | CcChildNode;
-  conditionNodes: Array<ConditionNodes>;
-  error: boolean;
-}
-
-/** 流程 */
-interface Data {
-  tableId: number; // 审批id
-  directorMaxLevel: number; //审批主管最大层级
-  flowPermission: Array<any>; //发起人
-  workFlowDef: WorkFlowDef;
-  nodeConfig: NodeConfig;
-}
-
-const data: Data = {
-  tableId: 0, //审批id
-  workFlowDef: {
-    name: "", //审批名称
-  },
-  directorMaxLevel: 0, //审批主管最大层级
-  flowPermission: [], //发起人
-  nodeConfig: {
-    nodeName: "", //节点名称
-    type: 0, // 0 发起人 1审批 2抄送 3条件 4路由
-    priorityLevel: 0, // 条件优先级
-    setApproverType: 0, // 审批人设置 1指定成员 2主管 4发起人自选 5发起人自己 7连续多级主管
-    selectMode: 0, //审批人数 1选一个人 2选多个人
-    selectRange: 0, //选择范围 1.全公司 2指定成员 2指定角色
-    directorLevel: 0, //审批终点  最高层主管数
-    examineMode: 0, //多人审批时采用的审批方式 1依次审批 2会签
-    noHandlerAction: 0, //审批人为空时 1自动审批通过/不允许发起 2转交给审核管理员
-    examineEndDirectorLevel: 0, //审批终点 第n层主管
-    ccSelfSelectFlag: 0, //允许发起人自选抄送人
-    conditionList: [], // 当审批单同时满足以下条件时进入此流程
-    nodeUserList: [], //操作人
-    childNode: {
-      nodeName: "",
-      error: false, //当前审批是否通过校验
-      type: 0,
-      setApproverType: 0,
-      selectMode: 0,
-      selectRange: 0,
-      directorLevel: 0,
-      examineMode: 0,
-      noHandlerAction: 0,
-      examineEndDirectorLevel: 0,
-    },
-  },
+// 发起人枚举
+export const FlowNodeObject = {
+  Launch: 0, // 发起
+  Action: 1, // 发起人
+  Approval: 2, // 审批
+  Copy: 3, // 抄送
+  Condition: 4, // 条件
+  Gateway: 5, // 网关
+  Handle: 6 // 处理人
 };
 
-export { data };
-export type { Data, NodeConfig };
+const actionDefault: FlowNodeType = {
+  type: 1,
+  nodeName: "发起人",
+  childNode: undefined,
+  fields: {
+    type: 0,
+    users: "",
+    roles: ""
+  }
+};
+
+// 审批_默认对象
+const approvalDefault: FlowNodeType = {
+  type: 2,
+  nodeName: "审批人",
+  childNode: undefined,
+  fields: {
+    type: 0,
+    users: "",
+    roles: "",
+    btnArr: [],
+    againType: ""
+  }
+};
+
+// 抄送_默认对象
+const copyDefault: FlowNodeType = {
+  type: 3,
+  nodeName: "抄送人",
+  childNode: undefined,
+  fields: {
+    type: 0,
+    users: "",
+    roles: ""
+  }
+};
+
+// 条件分支_默认对象
+export const conditionBranchDefault: FlowConditionItemType = {
+  id: "",
+  nodeName: "条件",
+  type: 4,
+  fields: {
+    conditionRule: "",
+    conditionRuleJson: ""
+  },
+  isOther: false,
+  childNode: undefined
+};
+
+// 条件分支_其他情况
+const conditionBranchOther: FlowConditionItemType = {
+  id: "",
+  nodeName: "其他情况",
+  type: 4,
+  fields: {
+    conditionRule: "${true}",
+    conditionRuleJson: "${true}"
+  },
+  isOther: true,
+  childNode: undefined
+};
+
+// 条件_默认对象
+const gatewayDefault: FlowNodeType = {
+  type: 5,
+  nodeName: "网关",
+  childNode: undefined,
+  conditionList: [],
+  fields: {
+    type: 0,
+    users: "",
+    roles: ""
+  }
+};
+
+// 处理人_默认对象
+const handleDefault: FlowNodeType = {
+  type: 6,
+  nodeName: "处理人",
+  childNode: undefined,
+  fields: {
+    type: 0,
+    users: "",
+    roles: "",
+    btnArr: [],
+    againType: ""
+  }
+};
+
+// 设置默认的条件分支
+const setConditionDefault = (gatewayDefault: FlowNodeType) => {
+  const _conditionBranchDefault = deepClone(conditionBranchDefault);
+  _conditionBranchDefault.id = "Condition_" + getRandomNumber();
+  _conditionBranchDefault.nodeName = `${_conditionBranchDefault.nodeName}1-优先级1`;
+  const _conditionBranchOther = deepClone(conditionBranchOther);
+  _conditionBranchOther.id = "Condition_" + getRandomNumber();
+  const _conditionDefaultData = deepClone(gatewayDefault);
+  _conditionDefaultData.conditionList.push(_conditionBranchDefault, _conditionBranchOther);
+  return _conditionDefaultData;
+};
+
+export const nodeConfigEnum = {
+  [FlowNodeObject.Launch]: {
+    name: "发起",
+    color: "#576a95",
+    tag: "Launch"
+  },
+  [FlowNodeObject.Action]: {
+    name: "发起人",
+    color: "#d2d0d0",
+    defaultObj: (): FlowNodeType => {
+      return actionDefault;
+    },
+    tag: "Action"
+  },
+  [FlowNodeObject.Approval]: {
+    name: "审批人",
+    color: "#f5a938",
+    defaultObj: (): FlowNodeType => {
+      return approvalDefault;
+    },
+    tag: "Approval"
+  },
+  [FlowNodeObject.Copy]: {
+    name: "抄送人",
+    color: "#3296fa",
+    defaultObj: (): FlowNodeType => {
+      return copyDefault;
+    },
+    tag: "Copy"
+  },
+  [FlowNodeObject.Gateway]: {
+    name: "网关",
+    color: "#02A7F0",
+    defaultObj: (): FlowNodeType => {
+      return setConditionDefault(gatewayDefault);
+    },
+    tag: "Gateway"
+  },
+  [FlowNodeObject.Handle]: {
+    name: "处理人",
+    color: "#15bc83",
+    defaultObj: (): FlowNodeType => {
+      return handleDefault;
+    },
+    tag: "Handle"
+  }
+};
+
+export const getLocalEnum = () => {
+  const executorTypeEnum = [
+    {
+      key: 1,
+      value: "指定成员"
+    },
+    {
+      key: 2,
+      value: "指定角色"
+    },
+    // {
+    //   key: 3,
+    //   value: "部门主管"
+    // },
+    {
+      key: 4,
+      value: "发起人本人"
+    }
+  ];
+
+  const multiExamineTypeEnum = [
+    // {
+    //   key: 0,
+    //   value: "会签（需所有审批人同意）"
+    // },
+    {
+      key: 1,
+      value: "或签（一名审批人同意即可）"
+    }
+    // {
+    //   key: 2,
+    //   value: "依次审批（按顺序依次审批）"
+    // }
+  ];
+
+  const filterTypeEnum = [];
+
+  return {
+    executorTypeEnum,
+    multiExamineTypeEnum
+  };
+};
+
+// 获取流程节点Id
+export const getNodeId = (type: number) => {
+  if (type === 4) {
+    return "Condition_" + getRandomNumber();
+  }
+  return nodeConfigEnum[type].tag + "_" + getRandomNumber();
+};
+
+//获取模板默认详情
+export const getFlowDefaultData = () => {
+  return {
+    id: 1,
+    flowName: "合同审批1",
+    nodeConfig: {
+      id: getNodeId(FlowNodeObject.Launch),
+      nodeName: "发起人", // 节点名称
+      type: FlowNodeObject.Launch,
+      conditionList: [], //条件列表
+      fields: {
+        type: 4,
+        users: "",
+        roles: ""
+      },
+      multiApprovalType: 1, // 发起人审核方式： 1会签 2或签 3一次审批
+      childNode: {
+        id: getNodeId(FlowNodeObject.Action),
+        nodeName: "发起人", // 节点名称
+        type: FlowNodeObject.Action,
+        conditionList: [], //条件列表
+        fields: {
+          type: 0,
+          users: "",
+          roles: ""
+        },
+        multiApprovalType: 1, // 发起人审核方式： 1会签 2或签 3一次审批
+        childNode: {
+          id: getNodeId(FlowNodeObject.Approval),
+          nodeName: "审批人", // 节点名称
+          type: FlowNodeObject.Approval,
+          conditionList: [], //条件列表
+          fields: {
+            type: 0,
+            users: "",
+            roles: "",
+            btnArr: [],
+            againType: ""
+          },
+          multiApprovalType: 2, // 发起人审核方式： 1会签 2或签 3一次审批
+          childNode: {
+            id: getNodeId(FlowNodeObject.Copy),
+            nodeName: "抄送人", // 节点名称
+            type: FlowNodeObject.Copy,
+            conditionList: [], //条件列表
+            fields: {
+              type: 0,
+              users: "",
+              roles: ""
+            },
+            multiApprovalType: 2, // 发起人审核方式： 1会签 2或签 3一次审批
+            childNode: null
+          }
+        }
+      }
+    }
+  } as FlowType;
+};
+
+// 订单跟进人
+export const getNodeContentTip = (
+  nodeConfig: FlowNodeType,
+  { manageList, roleList, isCustom }: { manageList: any[]; roleList: any[]; isCustom: boolean } = {
+    manageList: [],
+    roleList: [],
+    isCustom: false
+  }
+) => {
+  if (nodeConfig.type === FlowNodeObject.Action) {
+    return isCustom ? "发起人" : "订单跟进人";
+  }
+  // 0 未选择 1指定成员 2指定角色 3 部门主管 4发起人本人
+  switch (nodeConfig.fields.type) {
+    case 0:
+      return `请选择${nodeConfigEnum[nodeConfig.type].name}`;
+    case 1:
+      return `已选择用户:${getEnumValue(manageList, nodeConfig.fields.users, { keyName: "id", valueName: "name" })}`;
+    case 2:
+      return `已选择角色:${getEnumValue(roleList, nodeConfig.fields.roles, { keyName: "id", valueName: "name" })}`;
+    case 3:
+      return `已选择部门主管`;
+    case 4:
+      return `已选择发起人本人`;
+  }
+};

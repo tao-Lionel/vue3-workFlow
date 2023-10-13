@@ -1,17 +1,22 @@
-<!--
- * @Author: Wt
- * @Date: 2022-07-28 11:41:00
- * @Description: 
- * 
--->
 <template>
   <div class="process">
     <div class="process-nav">
       <span class="c-white">{{ processName }}</span>
-      <a-button type="">发布</a-button>
+      <a-button type="primary" @click="issue">发布</a-button>
     </div>
-    <div class="process-main">
-      <NodeWrap v-model:nodeConfigData="nodeConfigData" v-model:flowPermissionData="flowPermissionData"></NodeWrap>
+
+    <div class="zoom">
+      <div :class="'zoom-out' + (nowSize === 50 ? ' disabled' : '')" @click="zoomSize(1)">-</div>
+      <span>{{ nowSize }}%</span>
+      <div :class="'zoom-in' + (nowSize === 300 ? ' disabled' : '')" @click="zoomSize(2)">+</div>
+    </div>
+
+    <div
+      :key="divKey"
+      class="box-scale"
+      :style="'transform: scale(' + nowSize / 100 + '); transform-origin: 50% 0px 0px;'"
+    >
+      <nodeWrap :key="allNodeConfig.nodeConfig" v-model:node-config="allNodeConfig.nodeConfig"></nodeWrap>
       <div class="end-node">
         <div class="end-node-circle"></div>
         <div class="end-node-text">流程结束</div>
@@ -21,35 +26,39 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeMount, ref, Ref } from "vue";
+import { onMounted, onBeforeMount, ref, Ref, reactive } from "vue";
 import http from "@/plugins/axios";
-import { data, Data } from "./setting";
+import { getFlowDefaultData } from "./setting";
 import { useStore } from "vuex";
 
 onBeforeMount(async () => {
   // 获取数据
-  await http.get(`${process.env.BASE_URL}data.json`, {}).then(({ data }: { data: Data }) => {
-    const { workFlowDef, nodeConfig, flowPermission, directorMaxLevel, tableId } = data;
-    processData.value = data;
-    nodeConfigData.value = nodeConfig;
-    flowPermissionData.value = flowPermission;
-    directorMaxLevelData.value = directorMaxLevel;
-    processName.value = workFlowDef.name;
-    store.commit("setTableId", tableId);
-  });
+  // await http.get(`${process.env.BASE_URL}data.json`, {}).then(({ data }: { data: Data }) => {
+  let designObject = getFlowDefaultData();
+
+  allNodeConfig.value = designObject;
+  // });
 });
 
-const store = useStore();
+const allNodeConfig = ref<FlowType>({});
 
-const processName = ref<string>(""); // 流程名称
+const divKey = ref(new Date().getTime());
+const nowSize = ref(100);
 
-const processData = ref<Data>(data); // 本地备份的流程数据
+// 缩放流程图
+function zoomSize(type: 1 | 2) {
+  divKey.value = new Date().getTime();
+  if (type === 1) {
+    if (nowSize.value === 50) return;
+    nowSize.value -= 10;
+  } else {
+    if (nowSize.value === 300) return;
+    nowSize.value += 10;
+  }
+}
 
-const nodeConfigData = ref({}); // 本地的流程节点
-
-const flowPermissionData = ref<Array<any>>([]); // 本地的发起人
-
-const directorMaxLevelData = ref(0); // 本地的审批主管最大层级
+// 保存
+function issue() {}
 </script>
 
 <style scoped lang="scss">
