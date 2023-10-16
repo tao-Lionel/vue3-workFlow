@@ -33,8 +33,7 @@
               <p>条件分支</p>
             </a>
 
-            <!-- 回款审批才有处理人节点 -->
-            <a v-if="flowType === 3" class="add-node-popover-item handle" @click="addNode(FlowNodeObject.Handle)">
+            <a class="add-node-popover-item handle" @click="addNode(FlowNodeObject.Handle)">
               <div class="item-wrapper">
                 <img
                   src="https://staticcdn.youliao.com//static/image/cloud_pc/icon/flow-handle.png"

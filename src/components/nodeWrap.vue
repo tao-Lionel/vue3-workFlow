@@ -154,8 +154,12 @@
     v-model:node-config="nowNodeConfig.childNode"
   ></nodeWrap>
 
-  {{ components.name }}
-  <component :is="components.name" />
+  <component
+    :is="components.name"
+    :params="components.params"
+    @componentCancel="components.componentCancel"
+    @componentOk="components.componentOk"
+  />
 </template>
 
 <script setup lang="ts">
@@ -267,25 +271,34 @@ const blurConditionEvent = (index?: number) => {
 const getDrawer = (nowNodeConfig: FlowNodeType): string => {
   switch (nowNodeConfig.type) {
     case FlowNodeObject.Approval:
-      return "ApprovalPersonDrawer";
+      return ApprovalPersonDrawer;
     case FlowNodeObject.Copy:
-      return "CopyPersonDrawer";
+      return CopyPersonDrawer;
     case FlowNodeObject.Handle:
-      return "HandlePersonDrawer";
+      return HandlePersonDrawer;
     case FlowNodeObject.Gateway:
-      return "ConditionDrawer";
+      return ConditionDrawer;
   }
 };
 
 const components = reactive({
   name: "",
-  params: {}
+  params: {},
+
+  componentOk: () => {
+    components.componentCancel();
+  },
+
+  componentCancel: () => {
+    components.name = "";
+    components.params = {};
+  }
 });
 
 // 打开抽屉
 const openDetail = (componentName: string, obj: object) => {
-  console.log(`componentName==`, componentName, obj);
-  Object.assign(components, { name: componentName, params: obj });
+  components.name = componentName;
+  components.params = obj;
 };
 </script>
 

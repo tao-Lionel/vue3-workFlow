@@ -1,8 +1,8 @@
 <template>
-  <a-drawer :visible="true" title="审批人" width="50%" @close="savePromoter">
+  <a-drawer :visible="true" title="条件" width="50%" @close="savePromoter">
     <div class="personFoot">
-      <x-button class="mr-10" @click="goBack">取消</x-button>
-      <x-button type="primary" @click="sure">确认</x-button>
+      <a-button @click="goBack">取消</a-button>
+      <a-button type="primary" @click="sure">确认</a-button>
     </div>
   </a-drawer>
 </template>
@@ -21,8 +21,12 @@ const props = defineProps({
 
 const emit = defineEmits(["componentOk", "componentCancel"]);
 
-const savePromoter = () => {};
-const goBack = () => {};
+const savePromoter = () => {
+  emit("componentCancel");
+};
+const goBack = () => {
+  emit("componentCancel");
+};
 const sure = () => {};
 </script>
 

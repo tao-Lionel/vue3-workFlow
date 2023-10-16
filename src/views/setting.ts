@@ -12,6 +12,7 @@ export const FlowNodeObject = {
 };
 
 const actionDefault: FlowNodeType = {
+  id: "",
   type: 1,
   nodeName: "发起人",
   childNode: undefined,
@@ -24,6 +25,7 @@ const actionDefault: FlowNodeType = {
 
 // 审批_默认对象
 const approvalDefault: FlowNodeType = {
+  id: "",
   type: 2,
   nodeName: "审批人",
   childNode: undefined,
@@ -38,6 +40,7 @@ const approvalDefault: FlowNodeType = {
 
 // 抄送_默认对象
 const copyDefault: FlowNodeType = {
+  id: "",
   type: 3,
   nodeName: "抄送人",
   childNode: undefined,
@@ -76,6 +79,7 @@ const conditionBranchOther: FlowConditionItemType = {
 
 // 条件_默认对象
 const gatewayDefault: FlowNodeType = {
+  id: "",
   type: 5,
   nodeName: "网关",
   childNode: undefined,
@@ -89,6 +93,7 @@ const gatewayDefault: FlowNodeType = {
 
 // 处理人_默认对象
 const handleDefault: FlowNodeType = {
+  id: "",
   type: 6,
   nodeName: "处理人",
   childNode: undefined,
@@ -216,7 +221,7 @@ export const getNodeId = (type: number) => {
 export const getFlowDefaultData = () => {
   return {
     id: 1,
-    flowName: "合同审批1",
+    flowName: "合同审批xxx",
     nodeConfig: {
       id: getNodeId(FlowNodeObject.Launch),
       nodeName: "发起人", // 节点名称
@@ -288,9 +293,9 @@ export const getNodeContentTip = (
     case 0:
       return `请选择${nodeConfigEnum[nodeConfig.type].name}`;
     case 1:
-      return `已选择用户:${getEnumValue(manageList, nodeConfig.fields.users, { keyName: "id", valueName: "name" })}`;
+      return `已选择用户:`;
     case 2:
-      return `已选择角色:${getEnumValue(roleList, nodeConfig.fields.roles, { keyName: "id", valueName: "name" })}`;
+      return `已选择角色:`;
     case 3:
       return `已选择部门主管`;
     case 4:

@@ -2,7 +2,7 @@
   <div class="process">
     <div class="process-nav">
       <span class="c-white">{{ processName }}</span>
-      <a-button type="primary" @click="issue">发布</a-button>
+      <a-button @click="issue">发布</a-button>
     </div>
 
     <div class="zoom">
@@ -58,7 +58,9 @@ function zoomSize(type: 1 | 2) {
 }
 
 // 保存
-function issue() {}
+function issue() {
+  console.log("最后保存的数据", allNodeConfig.value.nodeConfig);
+}
 </script>
 
 <style scoped lang="scss">
